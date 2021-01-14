@@ -1,0 +1,186 @@
+-----------------------------------------------------------------------
+|  CHAPTER 3 - SMART COLLECTIONS                                      |
+-----------------------------------------------------------------------
+
+- Literal Shortcuts
+
+    # Create an array of words
+    poem_words = [ 'twinkle', 'little', 'star', 'how', 'I', 'wonder' ]
+
+    # Less verbose array creation
+    poem_words = %w{ twinkle little star how I wonder }
+
+
+    # Create a hash literal
+    freq = { "I" => 1, "don't" => 1, "like" => 1, "spam" => 963 }
+
+
+    # Use symbols as hash keys
+    book_info = { :first_name => 'Russ', :last_name => 'Olsen' }
+
+    # If using symbols as keys, can use Python syntax instead
+    book_info = { first_name: 'Russ', last_name: 'Olsen' }
+
+
+
+- Instant Arrays and Hashes from Method Calls
+
+    - Providing a Default Argument Value
+
+        def load_font( name, size = 12 )
+          # Go font hunting...
+        end
+
+
+    - Collecting Arguments with *splat
+
+        def echo_all( *args )
+          args.each { |arg| puts arg }
+        end
+
+        # Starred parameter in middle of list
+        def echo_at_least_two( first_arg, *middle_args, last_arg )
+          puts "The first argument is #{first_arg}"
+          middle_args.each { |arg| puts "A middle argument is #{arg}" }
+          puts "The last argument is #{last_arg}"
+        end
+
+
+    - Passing an Array as an Argument
+
+        def add_authors( name )
+          @author += " #{names.join(' ')}"
+        end
+
+        # Pass the array
+        doc.add_authors( [ 'Strunk', 'White' ] )
+
+
+    - Using splat so that you Don't Have to Pass an Array
+
+        def add_authors( *names )
+          @author += " #{names.join(' ')}"
+        end
+
+        # Pass the list of values
+        doc.add_authors( 'Strunk', 'White' )
+
+
+    - Passing a Hash as an Argument
+
+        def load_font( specification_hash )
+          # Load a font according to  specification_hash[:name] etc.
+        end
+
+        load_font( { :name => 'times roman', :size => 12 } )
+
+
+    - If the hash is the last value in an argument list, we can leave the braces off.
+
+        # Leave the braces off
+        load_font( :name => 'times roman', :size => 12 )
+
+        # Can even leave parentheses off
+        load_font :name => 'times roman', :size => 12
+
+
+
+- Running Through Your Collection
+
+    - Iterating over arrays
+
+        words = %w{ Mary had a little lamb }
+    
+        # Iterating by index (Don't do this, it's not Rubyist!)
+        for i in 0..words.size
+          puts words[i]
+        end
+    
+        # Rubyist way to iterate
+        words.each { |word| puts word }
+
+
+    - Iterating over hashes
+
+        movie = { title: '2001', genre: 'sci fi', rating: 10 }
+
+        # Iterate over hash entries
+        movie.each { |entry| pp entry }
+
+        # Iterate over keys and values
+        movie.each { |name, value| puts "#{name} => #{value}" }
+
+
+    - The 'find_index' method can be used to get the index of an element in an array
+
+        def index_for( word )
+          words.find_index { |this_word| word == this_word }
+        end
+
+
+    - The 'map' method takes a block and runs through the collection, calling the block for
+        each element.
+
+        pp doc.words.map { |word| word.size }
+
+        lower_case_words = doc.words.map { |word| word.downcase }
+
+
+    - The 'inject' method also calls a block for each element, but it also keeps track of some
+        value as it goes along.
+
+        def average_word_length
+          total = words.inject(0.0){ |result, word| word.size + result}
+          total / word_count
+        end
+
+
+
+- Beware the Bang!
+
+    - Methods with a ! at the end of the method name will change the collection.
+
+        a = [ 1, 2, 3 ]
+
+        # Won't change the collection
+        a.reverse
+        a.sort
+
+        # Will change the collection
+        a.reverse!
+        a.sort!
+
+
+
+- Rely on the Order of Your Hashes
+
+    - Both arrays and hashes in Ruby are ordered.  
+
+        hey_its_ordered = { first: 'mama', second: 'papa', third: 'baby' }
+
+        # You can count on these to still be in order
+        hey_its_ordered.each { |entry| pp entry }
+
+
+    - Newly added elements are placed at the end.
+
+        # This will be last
+        hey_its_ordered[:fourth] = 'grandma'
+
+
+
+- Arrays and Hashes are Used Everywhere
+
+    - For instance, the 'XmlSimple' gem takes an XML document and turns it into a set of nested
+        hashes and arrays.
+
+        require 'xmlsimple'
+
+        data = XmlSimple.xml_in('dc.xml')
+        pp data
+
+        # Output
+        {"super-hero" =>
+          [{"name" => ["Spiderman"], "origin" => ["Radioactive Spider"]},
+          {"name" => ["Hulk"], "origin" => ["Gamma Rays"]},
+          {"name" => ["Reed Richards"], "origin" => ["Cosmic Rays"]}]}
