@@ -1,0 +1,125 @@
+Ruby control structures
+#
+# if
+# unless
+#
+# while
+# until
+
+
+not can be used interchagedly with !
+  if not printed?
+  if !printed?
+  unless printed?
+
+
+Modifiers and declarations can often be put together on the same line.
+  @title = new_title unless @read_only
+  @title = new_title if @writable
+  document.print_next_page while document.pages_available?
+  document.print_next_page until document.printed?
+
+
+Each blocks are usually used instead of for loops
+  # Use this
+  fonts.each do |font|
+  end
+
+  # Not this
+  for font in fonts 
+
+
+Case statements are used commonly
+
+  # Case statement
+  case title
+  when 'War And Peace'
+    puts 'Tolstoy'
+  when 'Romeo And Juliet'
+    puts 'Shakespeare'
+  else
+    puts 'Unknown Author'
+  end
+
+  # Use case statement for assignment
+  author = case title
+           when 'War And Peace'
+             'Tolstoy'
+           when 'Romeo And Juliet'
+             'Shakespeare'
+           else 
+             'Unknown Author'
+           end
+
+  # More concise assignment
+  author = case title
+           when 'War And Peace' then 'Tolstoy'
+           when 'Romeo And Juliet' then  'Shakespeare'
+           else 'Unknown Author'
+           end
+
+
+  # Because the case statement uses a === comparison, can compare against class
+  case doc
+  when Document
+    puts "It's a document!"
+  when String
+    puts "It's a string!"
+  else
+    puts 'Not Sure'
+  end
+
+  # Can also uses regular expressions for comparison
+  case title
+  when /War And .*/
+    puts 'Maybe Tolstoy?'
+  when /Romeo And .*/
+    puts 'Maybe Shakespeare?'
+  else
+    puts 'Absolutely no idea...'
+  end
+
+  # Or you can just supply your own conditions
+  case
+  when title == 'War And Peace'
+    puts 'Tolstoy'
+  when title == 'Romeo And Juliet'
+    puts 'Shakespeare'
+  else
+    puts 'Absolutely no idea...'
+  end
+
+
+
+# Remember that in Ruby, only false and nil are treated as false.
+# Everything else is treated as true.
+
+
+
+# Subtle problem with nil and false:
+
+# This will not work as intended if you're checking for nil and 
+#   one of the objects returned if false:
+while next_object = get_next_object
+  ...
+end
+
+# This will worrk corectly:
+until (next_object = get_next_object).nil?
+  ...
+end
+
+
+
+# Ruby has the ?: ternary operator
+file = all ? 'specs' : 'latest_specs'
+
+
+
+# These are all equivalent:
+@first_name = '' unless @first_name
+@first_name = @first_name || ''
+@first_name ||= ''
+
+  * However not that you cannot initialize booleans this way, due to the 
+  *   false/nil problem above.

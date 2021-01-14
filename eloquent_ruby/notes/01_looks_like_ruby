@@ -1,0 +1,7 @@
+# Most basic ruby rules
+# 
+# 1. Use comments sparingly
+# 2. CamelCase for class name, snake_case for everything else
+# 3. Parentheses are optional, but you can't have empty parentheses
+# 4. In most cases, stick to one statement per line
+# 5. 
