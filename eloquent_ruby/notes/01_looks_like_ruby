@@ -1,7 +1,79 @@
-# Most basic ruby rules
-# 
-# 1. Use comments sparingly
-# 2. CamelCase for class name, snake_case for everything else
-# 3. Parentheses are optional, but you can't have empty parentheses
-# 4. In most cases, stick to one statement per line
-# 5. 
+-----------------------------------------------------------------------
+|  CHAPTER 1 - WRITE CODE THAT LOOKS LIKE RUBY                        |
+-----------------------------------------------------------------------
+
+- Pretty-printing Complex Objects
+
+    When working with the examples in this book, it's often useful to print objects.  The 'pp'
+      command is useful for this.
+
+      require 'pp'
+
+      pp complex_object
+
+
+
+- Most basic ruby rules
+
+    - All indentations are 2 spaces.
+
+
+    - Use comments sparingly.
+
+        # Comment line
+
+
+    - CamelCase for class name, snake_case for everything else.
+
+        ClassName
+        method_arg_variable_name
+
+        CONSTANT_VERSION_1
+        ConstantVersion2
+
+
+    - Parentheses are optional, but you can't have empty parentheses.
+
+        # Most ruby developers favor using parentheses
+        find_document('Frankenstein', 'Shelley')
+
+        # But some don't, and they're not required
+        find_document 'Frankenstein', 'Shelley'
+
+
+        # They are usually omitted with a familiar method and single argument
+        puts 'Look Ma, no parentheses!'
+
+
+        # No parentheses for an empty argument list
+        @content.split
+
+
+        # We generally leave parentheses off of conditions in control statements
+        if words.size < 100
+            puts 'This document is not very long.'
+        end
+
+
+    - In most cases, stick to one statement per line.
+
+        # This is legal, but not common
+        puts doc.title; puts doc.author
+
+
+        # If we're defining an empty type, it might be folded onto a single line
+        class DocumentException < Exception; end
+        def method_to_be_overridden; end
+    
+
+    - Fold up single-statement code blocks.
+
+        # If your block contains a single statement, fold it up
+        10.times { |n| puts "The number is #{n}." }
+
+
+        # If your block contains multiple statements, use do/end
+        10.times do |n|
+            puts "The number is #{n}."
+            puts "Twice the number is #{n*2}."
+        end
