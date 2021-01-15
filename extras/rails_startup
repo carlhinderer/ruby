@@ -1,0 +1,14 @@
+-----------------------------------------------------------------------
+|  RAILS STARTUP                                                      |
+-----------------------------------------------------------------------
+
+- Getting Started
+
+    # Create new rails app
+    $ rails new app_name
+
+    # Install gems
+    $ bundle install
+
+    # Run the application
+    $ rails server
