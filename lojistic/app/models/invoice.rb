@@ -9,6 +9,6 @@ class Invoice < ApplicationRecord
   scope :created_between, -> (begin_date, end_date) {where(date: begin_date..end_date)}
 
   def num_unique_services
-    2
+    self.packages.map(&:service_name).uniq.count
   end
 end
