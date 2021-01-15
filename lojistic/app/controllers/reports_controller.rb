@@ -1,4 +1,5 @@
 class ReportsController < ApplicationController
+    
   def index
     @reports = Report.where(:deleted => :false).all
   end
@@ -12,7 +13,7 @@ class ReportsController < ApplicationController
   end
 
   def preview
-    @invoices = Report.preview(start_date_from_params, end_date_from_params)
+    @invoices = Report.preview(report_params[:start_date], report_params[:end_date])
   end
 
   def create
@@ -39,16 +40,4 @@ class ReportsController < ApplicationController
     params.require(:report).permit(:report_type, :start_date, :end_date)
   end
 
-  def start_date_from_params
-    date_from_params 'start_date'
-  end
-
-  def end_date_from_params
-    date_from_params 'end_date'
-  end
-
-  def date_from_params(date_param)
-    date_parts = report_params[date_param].split('-')
-    Date.new(date_parts[0].to_i, date_parts[1].to_i, date_parts[2].to_i)
-  end
 end
