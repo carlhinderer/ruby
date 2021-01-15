@@ -1,6 +1,6 @@
 /* Reports List */
 
-table#reports-list {
+table {
   margin: 10px;
   margin-bottom: 30px;
   border-collapse: collapse;
@@ -8,13 +8,13 @@ table#reports-list {
   border-bottom: 2px solid black;
 }
 
-table#reports-list th {
+table th {
   border: 2px solid white;
   font-weight: bold;
   background-color: wheat;
 }
 
-table#reports-list th, table#reports-list td {
+table th, table td {
   padding: 4px;
   text-align: left;
 }

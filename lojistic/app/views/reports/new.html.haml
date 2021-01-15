@@ -7,18 +7,22 @@
       - @report.errors.full_messages.each do |error|
         %li= error
 
-= form_for @report, url: {action: 'create'} do |f|
+= form_for(Report.create) do |f|
 
   %label{:for => :report_type} Report Type
   = f.select :report_type, Report::REPORT_TYPES
   %br
 
   %label{:for => :start_date} Start Date
-  = f.date_select :start_date
+  = f.date_field :start_date
   %br
 
   %label{:for => :end_date} End Date
-  = f.date_select :end_date
+  = f.date_field :end_date
+  
+  = hidden_field_tag :authenticity_token, form_authenticity_token
+
+  = f.submit 'Preview', formaction: 'preview'
   %br
 
   = f.submit

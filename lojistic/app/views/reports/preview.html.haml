@@ -1,0 +1,20 @@
+%h2 Report Preview
+
+%table#invoices-list
+  %thead
+    %tr
+      %th Invoice Type
+      %th Invoice Date
+      %th Invoice Amount
+      %th Invoice Reference Number
+      %th Number of Packages
+      %th Unique Service Names
+  %tbody
+    - @invoices.each do |invoice|
+      %tr
+        %td #{invoice.invoice_type}
+        %td #{invoice.date}
+        %td #{invoice.amount}
+        %td #{invoice.reference_number}
+        %td #{invoice.packages.count}
+        %td #{invoice.num_unique_services}

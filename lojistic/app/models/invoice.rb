@@ -7,4 +7,8 @@ class Invoice < ApplicationRecord
   validates :invoice_type, inclusion: INVOICE_TYPES
 
   scope :created_between, -> (begin_date, end_date) {where(date: begin_date..end_date)}
+
+  def num_unique_services
+    2
+  end
 end
