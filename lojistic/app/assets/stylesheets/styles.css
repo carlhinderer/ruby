@@ -17,3 +17,17 @@ table#reports-list th, table#reports-list td {
   padding: 4px;
   text-align: left;
 }
+
+
+/* Flash Messages */
+
+#notice, #warning {
+  background: mediumseagreen;
+  margin: 1em 0;
+  padding: 4px;
+}
+
+#notice.message, #warning.message {
+  color: white;
+  text-align: center;
+}
