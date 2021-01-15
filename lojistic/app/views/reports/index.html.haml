@@ -1,0 +1,20 @@
+%h2 Reports List
+
+%table#reports-list
+  %thead
+    %tr
+      %th Type
+      %th Start Date
+      %th End Date
+      %th Download
+      %th Delete
+  %tbody
+    - @reports.each do |report|
+      %tr
+        %td #{report.report_type}
+        %td #{report.start_date}
+        %td #{report.end_date}
+        %td Download Link
+        %td 
+          = link_to 'Delete', report_path(report), :method => :delete, 
+              :data => {:confirm => 'Are you sure?'}
