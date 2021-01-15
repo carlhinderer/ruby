@@ -8,4 +8,8 @@ class Report < ApplicationRecord
   def soft_delete()
     self.update(:deleted => :true) 
   end
+
+  def self.preview(begin_date, end_date)
+    Invoice.created_between(begin_date, end_date).order(:date).take(50)
+  end
 end

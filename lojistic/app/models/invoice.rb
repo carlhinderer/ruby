@@ -5,4 +5,6 @@ class Invoice < ApplicationRecord
 
   validates :invoice_type, :date, :amount, :reference_number, presence: true
   validates :invoice_type, inclusion: INVOICE_TYPES
+
+  scope :created_between, -> (begin_date, end_date) {where(date: begin_date..end_date)}
 end
