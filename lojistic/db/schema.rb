@@ -13,7 +13,7 @@
 ActiveRecord::Schema.define(version: 2021_01_15_070330) do
 
   create_table "invoices", force: :cascade do |t|
-    t.string "type"
+    t.string "invoice_type"
     t.datetime "date"
     t.integer "amount"
     t.string "reference_number"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 2021_01_15_070330) do
   end
 
   create_table "reports", force: :cascade do |t|
-    t.string "type"
+    t.string "report_type"
     t.date "start_date"
     t.date "end_date"
     t.boolean "deleted"
