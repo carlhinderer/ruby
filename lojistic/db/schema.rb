@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_15_063352) do
+ActiveRecord::Schema.define(version: 2021_01_15_065840) do
 
   create_table "invoices", force: :cascade do |t|
     t.string "type"
@@ -20,6 +20,18 @@ ActiveRecord::Schema.define(version: 2021_01_15_063352) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["date"], name: "index_invoices_on_date"
+  end
+
+  create_table "packages", force: :cascade do |t|
+    t.string "tracking_number"
+    t.string "service_name"
+    t.date "ship_date"
+    t.date "delivery_date"
+    t.date "expected_delivery_date"
+    t.integer "invoice_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id"], name: "index_packages_on_invoice_id"
   end
 
 end
