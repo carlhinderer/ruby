@@ -11,10 +11,13 @@
   %tbody
     - @reports.each do |report|
       %tr
-        %td #{report.report_type}
+        %td 
+          = link_to "#{report.report_type}", report_path(report)
         %td #{report.start_date}
         %td #{report.end_date}
         %td Download Link
         %td 
           = link_to 'Delete', report_path(report), :method => :delete, 
               :data => {:confirm => 'Are you sure?'}
+
+= link_to 'Add New Report', new_report_path

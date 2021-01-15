@@ -1,0 +1,24 @@
+%h2 Create New Report
+
+- unless @report.errors.empty?
+  #warning
+    Errors prevented this report from being created.
+    %ul
+      - @report.errors.full_messages.each do |error|
+        %li= error
+
+= form_for @report, url: {action: 'create'} do |f|
+
+  %label{:for => :report_type} Report Type
+  = f.select :report_type, Report::REPORT_TYPES
+  %br
+
+  %label{:for => :start_date} Start Date
+  = f.date_select :start_date
+  %br
+
+  %label{:for => :end_date} End Date
+  = f.date_select :end_date
+  %br
+
+  = f.submit

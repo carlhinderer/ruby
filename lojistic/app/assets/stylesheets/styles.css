@@ -2,6 +2,7 @@
 
 table#reports-list {
   margin: 10px;
+  margin-bottom: 30px;
   border-collapse: collapse;
   width: 80%;
   border-bottom: 2px solid black;
