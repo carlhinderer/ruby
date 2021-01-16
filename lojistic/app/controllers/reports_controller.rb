@@ -20,6 +20,7 @@ class ReportsController < ApplicationController
     @report = Report.new(report_params)
     if @report.save
       flash[:notice] = "Report was successfully created. Currently being generated."
+      InvoiceSummaryReportCreateJob.perform_later(@report)
       redirect_to reports_path
     else
       render 'new'
