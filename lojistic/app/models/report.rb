@@ -4,6 +4,7 @@ class Report < ApplicationRecord
 
   validates :report_type, :start_date, :end_date, presence: true
   validates :report_type, inclusion: REPORT_TYPES
+  validates_with ReportDatesValidator
 
   has_one_attached :csv_report
   

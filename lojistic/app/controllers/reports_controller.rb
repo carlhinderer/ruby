@@ -13,7 +13,12 @@ class ReportsController < ApplicationController
   end
 
   def preview
-    @invoices = Report.preview(report_params[:start_date], report_params[:end_date])
+    @report = Report.new(report_params)
+    if @report.valid?
+      @invoices = Report.preview(@report.start_date, @report.end_date)
+    else
+      render 'new'
+    end
   end
 
   def create
