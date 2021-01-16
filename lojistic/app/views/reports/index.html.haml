@@ -16,7 +16,7 @@
         %td #{report.start_date}
         %td #{report.end_date}
         %td 
-          = link_to report.csv_report.filename, rails_blob_url(report.csv_report, disposition: 'attachment')
+          = download_link(report)
         %td 
           = link_to 'Delete', report_path(report), :method => :delete, 
               :data => {:confirm => 'Are you sure?'}
