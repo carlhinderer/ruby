@@ -1,5 +1,8 @@
 describe Report, type: :model do
-  let(:report) { build :report, start_date: 10.days.ago, end_date: 5.days.ago }
+  let(:report) { create :report, start_date: 10.days.ago, end_date: 5.days.ago }
+  let!(:invoice_within_range_1) { create :invoice, date: 8.days.ago }
+  let!(:invoice_within_range_2) { create :invoice, date: 7.days.ago }
+  let!(:invoice_outside_range) { create :invoice, date: 15.days.ago }
   
   describe "Validations" do
     it "it is valid with valid attributes" do
@@ -46,43 +49,19 @@ describe Report, type: :model do
 
   describe "#invoice_list" do
     it "should return the invoices within the date range in sorted order" do
-      inv1 = Invoice.create(invoice_type: 'Fedex', 
-                            date: 8.days.ago, 
-                            amount: 100, 
-                            reference_number: 'ABC123')
-      inv2 = Invoice.create(invoice_type: 'Fedex', 
-                            date: 7.days.ago, 
-                            amount: 100, 
-                            reference_number: 'ABC123')
-      inv3 = Invoice.create(invoice_type: 'Fedex', 
-                            date: 15.days.ago, 
-                            amount: 100, 
-                            reference_number: 'ABC123')
-      expect(report.invoice_list.first).to eq inv1
-      expect(report.invoice_list.last).to eq inv2
-      expect(report.invoice_list).to_not include inv3
+      expect(report.invoice_list.first).to eq invoice_within_range_1
+      expect(report.invoice_list.last).to eq invoice_within_range_2
+      expect(report.invoice_list).to_not include invoice_outside_range
     end
   end
 
   describe "#preview" do
     it "should return the invoices within the date range in sorted order" do
-      inv1 = Invoice.create(invoice_type: 'Fedex', 
-                            date: 8.days.ago, 
-                            amount: 100, 
-                            reference_number: 'ABC123')
-      inv2 = Invoice.create(invoice_type: 'Fedex', 
-                            date: 7.days.ago, 
-                            amount: 100, 
-                            reference_number: 'ABC123')
-      inv3 = Invoice.create(invoice_type: 'Fedex', 
-                            date: 15.days.ago, 
-                            amount: 100, 
-                            reference_number: 'ABC123')
       start_date = 10.days.ago
       end_date = 5.days.ago
-      expect(Report.preview(start_date, end_date).first).to eq inv1
-      expect(Report.preview(start_date, end_date).last).to eq inv2
-      expect(Report.preview(start_date, end_date)).to_not include inv3
+      expect(Report.preview(start_date, end_date).first).to eq invoice_within_range_1
+      expect(Report.preview(start_date, end_date).last).to eq invoice_within_range_2
+      expect(Report.preview(start_date, end_date)).to_not include invoice_outside_range
     end
   end
 end

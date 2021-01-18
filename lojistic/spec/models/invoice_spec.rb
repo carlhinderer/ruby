@@ -1,14 +1,13 @@
 describe Invoice, type: :model do
-  let(:invoice) { build :invoice }
-  let(:package_1) { build :package, service_name: 'Amazon' }
-  let(:package_2) { build :package, service_name: 'Walmart' }
-  let(:package_3) { build :package, service_name: 'Walmart' }
+  let(:invoice) { create :invoice }
+  let!(:package_1) { create :package, service_name: 'Amazon', invoice: invoice }
+  let!(:package_2) { create :package, service_name: 'Walmart', invoice: invoice }
+  let!(:package_3) { create :package, service_name: 'Walmart', invoice: invoice }
+
 
   describe "Associations" do
     it "should have many packages" do
-      invoice.packages << [package_1, package_2]
-      expect(invoice.packages).to include package_1
-      expect(invoice.packages).to include package_2
+      expect(invoice.packages.count).to eq 3
     end
   end
 
@@ -44,12 +43,7 @@ describe Invoice, type: :model do
   end
 
   describe "#num_unique_services" do
-    it "returns 0 if there are no associated packages" do
-      expect(invoice.num_unique_services).to eq 0
-    end
-
     it "returns the correct number of unique services if associated packages" do
-      invoice.packages << [package_1, package_2, package_3]
       expect(invoice.num_unique_services).to eq 2
     end
   end
