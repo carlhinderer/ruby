@@ -3,7 +3,6 @@ describe Invoice, type: :model do
   let(:package_1) { build :package, service_name: 'Amazon' }
   let(:package_2) { build :package, service_name: 'Walmart' }
   let(:package_3) { build :package, service_name: 'Walmart' }
-  let(:invoice_with_packages) { invoice.packages << [package_1, package_2, package_3] }
 
   describe "Associations" do
     it "should have many packages" do
@@ -20,6 +19,11 @@ describe Invoice, type: :model do
 
     it "is not valid without an invoice type" do
       invoice.invoice_type = nil
+      expect(invoice).to_not be_valid
+    end
+
+    it "is not valid with an unrecognized invoice type" do
+      invoice.invoice_type = 'FakeShipping'
       expect(invoice).to_not be_valid
     end
 

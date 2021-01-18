@@ -9,7 +9,7 @@ class Report < ApplicationRecord
   has_one_attached :csv_report
   
   def soft_delete
-    self.update(:deleted => :true) 
+    self.update(:deleted => true) 
   end
 
   def invoice_list

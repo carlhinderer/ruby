@@ -14,4 +14,11 @@ FactoryBot.define do
     delivery_date { 3.days.ago }
     invoice
   end
+
+  factory :report do
+    report_type { 'InvoiceSummary' }
+    start_date { 20.days.ago }
+    end_date { 5.days.ago }
+    deleted { false }
+  end
 end
