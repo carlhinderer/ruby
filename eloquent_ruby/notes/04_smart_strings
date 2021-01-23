@@ -1,3 +1,119 @@
 -----------------------------------------------------------------------
 |  CHAPTER 4 - SMART STRINGS                                          |
 -----------------------------------------------------------------------
+
+- Using Strings
+
+    - Single-quote strings can only contain \ escape characters.
+
+        a_string_with_a_quote = 'Say it ain\'t so!'
+        a_string_with_a_backslash = 'This is a backslash: \\'
+
+
+    - Double-quote strings can include interpolations
+
+        author = "Ben Bova"
+        title = "Mars"
+        puts "#{title} is written by #{author}"
+    
+
+    - If you have a string with tons of quotes, you can use the arbitrary quote mechanism.
+
+        str = %q{"Stop", she said, "I can't live without 's and "s."}
+        str = %q("Stop", she said, "I can't live without 's and "s.")
+        str = %q<"Stop", she said, "I can't live without 's and "s.">
+        str = %q$"Stop", she said, "I can't live without 's and "s."$
+
+        # Using an uppercase Q will give you double-quoted interpretation
+        str = %Q<The time in now #{Time.now}>
+
+
+    - Strings can span multiple lines.
+
+        # Will contain newline characters
+        a_multiline_string = "a multi-line
+        string"
+
+        another_one = %q{another multi-line
+        string}
+
+
+        # Use the \ if you don't want newline characters
+        yet_another = %Q{another multi-line string with \no newline}
+
+
+    - For very long multiline strings, use here documents.
+
+        heres_one = <<EOF
+        This is the beginning of my here document.
+        And this is the end.
+        EOF
+
+
+
+- The String API
+
+    # Strip whitespace
+    'hello'.lstrip
+    'hello'.rstrip
+    'hello'.strip
+
+
+    # Remove at most one newline
+    'hello\n'.chomp
+
+    # Remove the last character
+    'hello'.chop
+
+
+    # Change case
+    'hello'.upcase
+    'hello'.downcase
+    'hello'.swapcase
+
+
+    # Substitute
+    'It is warm outside'.sub( 'warm', 'cold' )
+    'It is warm outside'.gsub( 'warm', 'cold' )
+
+    # Bang methods change string in place
+    str.sub!( 'warm', 'cold' )
+
+
+    # Tokenize
+    str.split
+    str.split( ':' )
+
+
+    # Get position
+    str.index('abc')
+
+
+
+- Collections of Lines, Characters, and Bytes
+
+    # Iterate over characters in strings
+    @author.each_char { |c| puts c }
+
+    # Iterate over bytes to get ASCII codes
+    @author.each_byte { |b| puts b }
+
+    # Iterate over lines
+    @content.each_line { |line| puts line }
+
+
+
+- Example - Escape a string for HTML
+
+    def html_escape(s)
+      s.to_s.gsub(/&/, "&amp;").
+        gsub(/\"/, "&quot;").
+        gsub(/>/, "&gt;").
+        gsub(/</, "&lt;")
+    end
+
+
+
+- Strings are Reference Types
+
+    
