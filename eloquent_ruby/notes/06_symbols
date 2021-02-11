@@ -1,3 +1,36 @@
 -----------------------------------------------------------------------
 |  CHAPTER 6 - SYMBOLS                                                |
 -----------------------------------------------------------------------
+
+- Strings and Symbols
+
+    # Pass in flag to ActiveRecord
+    book = Book.find(:all)
+
+    # Strings are used for holding data to be processed
+    # Symbols are used to hold symbolic markers (they lack the String API)
+
+    # Convert from symbol to string
+    the_string = :all.to_s
+
+    # Convert from string to symbol
+    the_symbol = 'all'.to_sym
+
+
+
+- Optimized to Stand for Something
+
+    # Symbols are immutable, which makes them a common choice for hash keys
+    book = {}
+    book[:author] = 'Jules Verne'
+    book[:title] = 'Around the World'
+
+    puts "Author: #{book[:author]} Title: #{book[:title]}"
+
+
+    # This is a common error, will throw exception
+    puts "Author: #{book['author']} Title: #{book['title']}"
+
+
+    # The above problem is so common that the 'HashWithIndifferentAccess' class is widely used
+    #   Ruby applications.  It lets you access using either string or symbol keys.
