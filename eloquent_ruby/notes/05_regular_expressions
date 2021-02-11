@@ -1,3 +1,108 @@
 -----------------------------------------------------------------------
 |  CHAPTER 5 - REGULAR EXPRESSIONS                                    |
 -----------------------------------------------------------------------
+
+- Matching One Character at a Time
+
+    .   # Matches any single character
+    ..  # Matches any 2 characters
+
+    \.  # Matches a literal .
+
+    # Matches 3.14
+    3\.14
+
+
+
+- Sets, Ranges, and Alternatives
+
+    [0123456789]    # Matches any single digit
+
+    # Matches name in any case
+    [Rr]uss [Oo]lsen
+
+
+    [0-9a-f]        # Matches any hex digit
+    [0-9a-zA-Z_]    # Matches any letter, number, or underscore
+
+    \d              # Matches any digit
+    \w              # Any letter, number, or underscore
+    \s              # Any whitespace character
+
+
+    [AM|PM]         # Matches either AM or PM
+
+    # Matches car or boat
+    The (car|boat) is red
+
+
+
+- The Regular Expression Star
+
+    *      # Matches 0 or more instances of the thing before the asterisk
+
+    # A followed by any number of B's
+    AB*
+
+    # Match any number of vowels
+    [aeiou]*
+
+    # Match any number of digits
+    [0-9]*
+
+    # Match any number of characters
+    .*
+
+
+
+- Regular Expressions in Ruby
+
+    # RegExps are a built-in type in Ruby
+
+    # Use the =~ operator to compare to a string (returns position at start of match)
+    puts /\d\d:\d\d (AM|PM)/ =~ '10:24 PM'
+    0
+
+    # Returns nil if there is no match
+    /May/ =~ 'Sometime in June'
+    nil
+
+    # String can be on either side of operator
+    puts "It's morning!" if '10:24 AM' =~ /AM/
+
+    # Case-insensitive
+    puts "It matches!" if /AM/i =~ 'am'
+
+
+
+- Using Regular Expressions
+
+    # Blot out times in document content
+    class Document
+      # Most of the class omitted...
+
+      def obscure_times!
+        @content.gsub!( /\d\d:\d\d (AM|PM)/, '**:** **' )
+      end
+    end
+
+
+
+- Beginnings and Endings
+
+    # Regexp for exact string
+    /Once upon a time/
+
+
+    # Starts with search string
+    /\AOnce upon a time/
+
+    # Ends with search string
+    /and they all lived happily ever after\z/
+
+
+    # Beginning of any line in multiline text starts with search string
+    puts "Found it" if content =~ /^Once upon a time/
+
+    # End of any line in multiline text ends with search string
+    puts "Found it" if content =~ /happily ever after\.$/
