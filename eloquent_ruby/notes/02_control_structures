@@ -9,6 +9,14 @@
       @title = new_title
     end
 
+    if @readable
+      ...
+    elsif @writable
+      ...
+    else
+      ...
+    end
+
     if not @read_only
       @title = new_title
     end
@@ -29,7 +37,15 @@
     # until is "while not"
     until document.is_printed?
       document.print_next_page
-      end
+    end
+
+
+    # Collapse onto a single line
+    @title = new_title unless @read_only
+    @title = new_title if @writable
+
+    document.print_next_page while document.pages_available?
+    document.print_next_page until document.printed?
 
 
 
@@ -149,7 +165,7 @@
       ...
     end
 
-    # This will worrk corectly:
+    # This will work corectly:
     until (next_object = get_next_object).nil?
       ...
     end

@@ -184,3 +184,14 @@
           [{"name" => ["Spiderman"], "origin" => ["Radioactive Spider"]},
           {"name" => ["Hulk"], "origin" => ["Gamma Rays"]},
           {"name" => ["Reed Richards"], "origin" => ["Cosmic Rays"]}]}
+
+
+
+- The Set Class
+
+    - Sometimes, we need a different data strucuture, such as a set to keep track of whether a
+        word has appeared in a document.
+
+        require 'set'
+
+        word_set = Set.new(words)

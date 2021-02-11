@@ -116,4 +116,13 @@
 
 - Strings are Reference Types
 
-    
+    - Ruby strings are mutable!
+
+        first_name = 'Jon'
+        first_name[0] = 'R'
+
+        # Don't change the existing string
+        first_name = first_name.upcase
+
+        # Change the existing string
+        first_name.upcase!
