@@ -1,3 +1,90 @@
 -----------------------------------------------------------------------
 |  CHAPTER 7 - EVERYTHING IS AN OBJECT                                |
 -----------------------------------------------------------------------
+
+- Classes, Instances, and Methods
+
+    # Very Simple Class
+    class Document
+      # Most of the class omitted...
+
+      def words
+        @content.split
+      end
+
+      # And another one
+      def word_count
+        words.size
+      end
+    end
+
+
+    # Create an instance
+    doc = Document.new('Ethics', 'Spinoza', 'By that which is...')
+
+
+    # We could use self to qualify instance attributes, but self is default object so we should omit
+    def about_me
+      puts "My title is #{self.title}"
+    end
+
+    # Just use this instead
+    def about_me
+      puts "My title is #{title}"
+    end
+
+
+    # Create a subclass, all classes inheret from Object
+    class RomanceNovel < Document
+      # Lots of steamy stuff omitted...
+    end
+
+
+
+- Objects All the Way Down
+
+    # In Ruby, everything is an object
+    -3.abs
+    "abc".upcase
+    :abc.length
+    /abc/.class
+
+
+    # true and false are objects
+    true.class         # Returns Trueclass
+    false.nil?         # False is close, but not nil
+
+
+    # A class is an object
+    true.class.class   # Returns Class
+
+
+    # nil is an object
+    nil.class          # Returns NilClass
+    nil.nil?           # Returns true
+
+
+
+- The Importance of Being an Object
+
+    # All Ruby objects inherit a set of methods from the Object class
+    class
+    instance_of?
+    to_s
+
+
+
+- Public, Private, and Protected
+
+
+
+Johnny Fletcher
+Lojistic
+
+4357319373
+
+johnny@lojistic.com
+
+Same Credentials
+
+LastPass
