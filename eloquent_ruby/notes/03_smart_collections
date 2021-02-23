@@ -48,7 +48,7 @@
 
     - Passing an Array as an Argument
 
-        def add_authors( name )
+        def add_authors( names )
           @author += " #{names.join(' ')}"
         end
 
@@ -129,9 +129,9 @@
     - The 'inject' method also calls a block for each element, but it also keeps track of some
         value as it goes along.
 
-        def average_word_length
+        def average_word_length(words)
           total = words.inject(0.0){ |result, word| word.size + result}
-          total / word_count
+          total / words.size
         end
 
 

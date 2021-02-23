@@ -160,7 +160,7 @@
 
 
     # This will not work as intended if you're checking for nil and 
-    #   one of the objects returned if false:
+    #   one of the objects returned is false:
     while next_object = get_next_object
       ...
     end

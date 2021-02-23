@@ -74,6 +74,6 @@
 
         # If your block contains multiple statements, use do/end
         10.times do |n|
-            puts "The number is #{n}."
-            puts "Twice the number is #{n*2}."
+          puts "The number is #{n}."
+          puts "Twice the number is #{n*2}."
         end

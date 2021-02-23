@@ -12,7 +12,6 @@
         @content.split
       end
 
-      # And another one
       def word_count
         words.size
       end
@@ -73,18 +72,115 @@
     to_s
 
 
+    # We can rely on these methods being available by default
+    doc = Document.new('Emma', 'Austin', 'Emma Woodhouse, ...')
+
+    puts doc
+    #<Document:0x8767120>
+
+    # Or we can override them for our own purposes
+    class Document
+      ...
+
+      def to_s
+        "Document: #{title} by #{author}"
+      end
+    end
+
+
+    # The 'eval' method defined by Object takes a string and executes it as Ruby code
+    while true
+      print "Cmd> "
+      cmd = gets
+      puts(eval(cmd))
+    end
+
+    # Note that 'print' prints without newlines, while 'puts' adds a newline
+
+
+    # The 'Object' class also has a set of reflection-oriented methods you can use to get internals
+    pp doc.public_methods
+    pp doc.instance_variables
+
+
 
 - Public, Private, and Protected
 
+    # Methods can be made private by adding 'private' keyword in class
+    class Document
+      ...
+
+      private     # Methods are private starting here
+
+      def word_count
+        return words.size
+      end
+    end
 
 
-Johnny Fletcher
-Lojistic
+    # Or methods can also be made private by declaring it after the fact
+    class Document
+      ...
 
-4357319373
+      def word_count
+        return words.size
+      end
 
-johnny@lojistic.com
+      private :word_count
+    end
 
-Same Credentials
 
-LastPass
+    - Private methods can only be called from inside the class definition or a subclass definition.
+
+    - Protected methods can only be called from instances of the same class.  For instance, if the 'word_count' method was 
+        protected, any instance of the 'Document' class could call it on any other instance.
+
+    - Note that 'private' and 'protected' don't get as much use in Ruby as they do in other languages.
+
+
+    # Note that you can always call any method using the 'Object' class's 'send' method
+    n = doc.send(:word_count)
+
+
+
+- Keywords are methods
+
+    - Note that many keywords in Ruby are actually implemented as methods.  For instance, 'public', 'private', and 'protected'
+        are actually just methods that are implemented inside the Ruby interpreter.
+
+
+    - The 'require' method is also defined in the Ruby interpreter.  It takes the name of a file, reads the file, and executes
+        the contents as Ruby code.  This method maintains a list of files it has already processed, and won't re-execute a
+        file it has already seen.
+
+        require 'date'
+
+
+    - The 'attr_accessor' methods are also used as keywords.
+
+        class Person
+          attr_accessor :salary
+          attr_reader :name
+          attr_writer :password
+        end
+
+
+
+- Avoiding Name Collisions
+
+    - The good news is that the 'Object' class contains 50 methods that do all sorts of useful things.  But you have to be
+        careful not to collide with any of those methods!
+
+        class Document
+
+          # This overrides the 'send' method
+          def send(recipient)
+            ...
+          end
+
+          # This overrides the to_s method
+          def to_s
+            ...
+          end
+
+        end
