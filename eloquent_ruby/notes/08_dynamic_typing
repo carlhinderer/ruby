@@ -4,8 +4,110 @@
 
 - Shorter Programs
 
+    - Duck Typing = if an object has the right methods, it is the right kind of object
+
+
+    - Here is an example of code that works, but is not Rubyist.  The thing that's not Rubyist is that the 
+        'BaseDocument' class doesn't do anything and has no reason to exist.
+
+        class BaseDocument
+          def title
+            raise "Not implemented"
+          end
+
+          def title=
+            raise "Not implemented"
+          end
+
+          def author
+            raise "Not implemented"
+          end
+
+          def author=
+            raise "Not implemented"
+          end
+
+          def content
+            raise "Not implemented"
+          end
+
+          ...
+        end
+
+        class Document < BaseDocument
+          attr_accessor :title, :author, :content
+
+          def initialize( title, author, content )
+            @title = title
+            @author = author
+            @content = content
+          end
+
+          def words
+            @content.split
+          end
+
+          def word_count
+            words.size
+          end
+        end
+
+        class LazyDocument < BaseDocument
+          attr_writer :title, :author, :content
+
+          def initialize( path )
+            @path = path
+            @document_read = false
+          end
+
+          def read_document
+            return if @document_read
+            File.open( @path ) do | f |
+              @title = f.readline.chomp
+              @author = f.readline.chomp
+              @content = f.read
+            end
+            @document_read = true
+          end
+
+          def title
+            read_document
+            @title
+          end
+
+          def title=( new_title )
+            read_document
+            @title = new_title
+          end
+
+          # And so on...
+        end
+
+
 
 - Extreme Decoupling
 
+    - If you added a new class each for the book title and author, you can still use the same 'Document' class.
 
-- Required Ceremony vs Programmer-Driven Clarity
+        class Title
+          attr_reader :long_name, :short_name, :isbn
+
+          def initialize(long_name, short_name, isbn)
+            @long_name = long_name
+            @short_name = short_name
+            @isbn = isbn
+          end
+        end
+
+        class Author
+          attr_reader :first_name, :last_name
+
+          def initialize(first_name, last_name)
+            @first_name = first_name
+            @last_name = last_name
+          end
+        end
+
+        two_cities = Title.new('A Tale of Two Cities', '2 Cities', '0-999-99-99999-9')
+        dickens = Author.new('Charles', 'Dickens')
+        doc = Document.new(two_cities, dickens, 'It was the best...')
