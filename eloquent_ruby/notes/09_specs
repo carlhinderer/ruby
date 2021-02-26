@@ -4,17 +4,246 @@
 
 - Using Test::Unit
 
+    - In Test::Unit, each test is packaged in a method beginning with 'test'.
+
+        def test_document_holds_onto_contents
+          text = 'A bunch of words'
+          doc = Document.new('test', 'nobody', text)
+          assert_equal text, doc.content
+        end
+
+
+    - We can use the 'assert' method with any arbitrary condition also.
+
+        assert doc.words.include?('bunch')
+
+
+
+- A Test::Unit Test Class
+
+    - Here is a test class with 3 tests:
+
+        require 'test/unit'
+        require 'document.rb'
+
+        class DocumentTest < Test::Unit::TestCase
+          def setup
+            @text = 'A bunch of words'
+            @doc = Document.new('test', 'nobody', text)
+          end
+
+          def test_document_holds_onto_contents
+            assert_equal @text, @doc.content, 'Contents are still there'
+          end
+
+          def test_that_doc_can_return_words_in_array
+            assert @doc.words.include?( 'A' )
+            assert @doc.words.include?( 'bunch' )
+            assert @doc.words.include?( 'of' )
+            assert @doc.words.include?( 'words' )
+          end
+
+          def test_that_word_count_is_correct
+            assert_equal 4, @doc.word_count, 'Word count is correct'
+          end
+        end
+
+
+    - To run our tests:
+
+        $ ruby document_test.rb
+
+
+    - The 'setup' method gets called before each test is run, and the 'teardown' method gets called after each test 
+        is run.
+
+
 
 - A Plethora of Assertions
+
+    - Test::Unit contains a bunch of built-in assertions that we can use in tests.
+
+        # Assert a regex match
+        assert_match /times.*/, 'times new roman'
+
+        # Assert type of an object
+        assert_instance_of String, 'hello'
+
+        # Assert an exception is raised
+        assert_raise ZeroDivisionError do
+          x = 1 / 0
+        end
+
+        # Assert an exception is not raised
+        assert_nothing_thrown do
+          x = 1 / 2
+        end
+
 
 
 - Using Rspec
 
+    - Rspec takes a BDD approach to testing.  Here is the same set of tests, written in RSpec.
+
+        require 'document'
+
+        describe Document do
+          it 'should hold on to the contents' do
+            text = 'A bunch of words'
+            doc = Document.new( 'test', 'nobody', text )
+            doc.content.should == text
+          end
+
+          it 'should return all of the words in the document' do
+            text = 'A bunch of words'
+            doc = Document.new( 'test', 'nobody', text )
+            doc.words.include?( 'A' ).should == true
+            doc.words.include?( 'bunch' ).should == true
+            doc.words.include?( 'of' ).should == true
+            doc.words.include?( 'words' ).should == true
+          end
+
+          it 'should know how many words it contains' do
+            text = 'A bunch of words'
+            doc = Document.new( 'test', 'nobody', text )
+            doc.word_count.should == 4
+          end
+        end
+
+
+    - Note that the RSpec 'should' matchers are flexible, so you can right specs a variety of different ways.
+
+        doc.words.should include('bunch')
+
+        doc.content.should match(/A bunch.*/)
+
+        doc.words.should_not include('Excelsior')
+
+
+    - To run our tests:
+
+        # Run a single test
+        $ spec document_spec.rb
+
+        # Run all tests that match our *_spec naming convention
+        $ spec .
+
+
 
 - A Tidy Spec is a Readable Spec
+
+    - We can use a 'before' block to set up test data.
+
+        describe Document do
+          before :each do
+            @text = 'A bunch of words'
+            @doc = Document.new( 'test', 'nobody', @text )
+          end
+
+          it 'should hold on to the contents' do
+            @doc.content.should == @text
+          end
+
+          ...
+        end
+
+
+    - The 'after' block can be used to add teardown code that runs after each test.
+
+
+    - For code that just runs once before all tests or once after all tests, we use:
+
+        before(:all)
+        after(:all)
+
 
 
 - Easy Stubs
 
+    - A 'stub' impelements the same interface as some supporting object, but just returns canned answers.
+
+
+    - Imagine we have a 'PrintableDocument' class, and we need to test the printer functionality.
+
+        class PrintableDocument < Document
+          def print(printer)
+            return 'Printer unavailable' unless printer.available?
+            printer.render("#{title}\n")
+            printer.render("By #{author}\n")
+            printer.render(content)
+            'Done'
+          end
+        end
+
+
+    - The RSpec 'stub' method can be used to create stub objects.
+
+        stub_printer = stub :available? => true, :render => nil
+
+
+    - Now, we can test our 'PrintableDocument' class.
+
+        describe PrintableDocument do
+          before :each do
+            @text = 'A bunch of words'
+            @doc = PrintableDocument.new( 'test', 'nobody', @text )
+          end
+
+          it 'should know how to print itself' do
+            stub_printer = stub :available? => true, :render => nil
+            @doc.print( stub_printer ).should == 'Done'
+          end
+
+          it 'should return the proper string if printer is offline' do
+            stub_printer = stub :available? => false, :render => nil
+            @doc.print( stub_printer ).should == 'Printer unavailable'
+          end
+        end
+
+
+    - RSpec also provides the 'stub!' method, which allows you to stub out individual methods on any object.
+
+        apparently_long_string = 'actually short'
+        apparently_long_string.stub!(:length).and_return(1000000)
+
+
 
 - Easy Mocks
+
+    - Stubs are great for producing the boring infrastructure required to make a test work.  A mock is similar, but is 
+        a more active participant in the test.  It knows which methods should be called and with what arguments.
+        A disappointed mock will fail the test.
+
+
+    - RSpec provides the 'mock' method for creating mock objects.
+
+        it 'should know how to print itself' do
+          mock_printer = mock('Printer')
+          mock_printer.should_receive(:available?).and_return(true)
+          mock_printer.should_receive(:render).exactly(3).times
+          @doc.print( mock_printer ).should == 'Done'
+        end
+
+
+
+- Other Popular Frameworks
+
+    - People using Test::Unit will often add the 'shoulda' gem, which defines a bunch of useful utilities for
+        running Test::Unit tests.
+
+    - The 'mocha' gem is used for providing mock objects to Test::Unit tests.
+
+    - The 'Minitest' gem is a complete rewrite of Test::Unit.
+
+
+
+- Testing Guidelines
+
+    - Automated tests are a magical elixir for software quality!
+
+    - Unit tests should run quickly.  Ideally, the entire suite runs in a few minutes, on a setup that
+        every developer has.
+
+    - Tests should be silent.  They should only tell whether they succeeded or failed by default.
+
+    - Tests need to be independent.  Tests should not rely on the output of another test.
