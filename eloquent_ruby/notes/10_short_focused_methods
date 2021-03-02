@@ -1,0 +1,116 @@
+-----------------------------------------------------------------------
+|  CHAPTER 10 - CONSTRUCT CLASSES FROM SHORT, FOCUSED METHODS         |
+-----------------------------------------------------------------------
+
+- Constructing a Class
+
+    Here is an example of using short, focused methods.  We have a class that compresses text documents.
+
+      class TextCompressor
+        attr_reader :unique, :index
+
+        def initialize(text)
+          @unique = []
+          @index = []
+          add_text(text)
+        end
+
+        def add_text(text)
+          words = text.split
+          words.each { |word| add_word(word) }
+        end
+
+        def add_word(word)
+          i = unique_index_of(word) || add_unique_word(word)
+          @index << i
+        end
+
+        def unique_index_of(word)
+          @unique.index(word)
+        end
+
+        def add_unique_word(word)
+          @unique << word
+          unique.size - 1
+        end
+      end
+
+
+
+- The 'Composed Method' Technique
+
+    Methods should have 3 characteristics:
+
+      1. Each method should do a single thing.
+
+      2. Each method should operate at a single conceptual level.
+
+      3. Each method should have a name that reflects its purpose.
+
+
+
+- Testing the Class
+
+    Short methods also lead to easier testing.  The text compressor class is easy to test:
+
+      describe TextCompressor do
+        it "should be able to add some text" do
+          c = TextCompressor.new('')
+          c.add_text('first second')
+          c.unique.should == ['first', 'second']
+          c.index.should == [0, 1]
+        end
+
+        it "should be able to add a word" do
+          c = TextCompressor.new('')
+          c.add_word('first')
+          c.unique.should == ['first']
+          c.index.should == [0]
+        end
+
+        it "should be able to find the index of a word" do
+          c = TextCompressor.new('hello world')
+          c.unique_index_of('hello').should == 0
+          c.unique_index_of('world').should == 1
+        end
+
+        ...
+      end
+
+
+
+- Example - Multiple Return Statements
+
+    It really doesn't matter if a method has multiple 'return' statements, as long as it makes sense.
+
+      def prose_rating
+        return :really_pretentious if really_pretentious?
+        return :somewhat_pretentious if somewhat_pretentious?
+        return :really_informal if really_informal?
+        return :somewhat_informal if somewhat_informal?
+        return :about_right
+      end
+
+      def really_pretentious?
+        pretentious_density > 0.3 && informal_density < 0.2
+      end
+
+      def somewhat_pretentious?
+        pretentious_density > 0.3 && informal_density >= 0.2
+      end
+
+      def really_informal?
+        pretentious_density < 0.1 && informal_density > 0.3
+      end
+
+      def somewhat_informal?
+        pretentious_density < 0.1 && informal_density <= 0.3
+      end
+
+      def pretentious_density
+        # Somehow compute density of pretentious words
+      end
+
+      def informal_density
+        # Somehow compute density of informal words
+      end
