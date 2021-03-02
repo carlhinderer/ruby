@@ -1,0 +1,95 @@
+-----------------------------------------------------------------------
+|  CHAPTER 11 - DEFINE OPERATORS RESPECTFULLY                         |
+-----------------------------------------------------------------------
+
+- Defining Operators
+
+    - Ruby translates every expression involving programmer-definable operators into an equivalent method
+        call.
+
+        # This is called
+        sum = first + second
+
+        # This is how it's implemented
+        sum = first.+(second)
+
+
+    - Here, we implement the + operator in our 'Document' class.
+
+        class Document
+          ...
+
+          def +(other)
+            Document.new(title, author, "#{content} #{other.content}")
+          end
+        end
+
+        doc1 = Document.new('Tag Line1', 'Kirk', "These are the voyages")
+        doc2 = Document.new('Tag Line2', 'Kirk', "of the star ship ...")
+        total_document = doc1 + doc2
+        puts total_document.content
+
+
+
+- Sampling of Operators
+
+    - Ruby lets you override more than 20 operators.
+
+        + - * / %
+        & | ^ !
+        <<
+
+
+    - Example - Overriding !
+
+        class Document
+          ...
+
+          def !
+            Document.new(title, author, "It is not true: #{content}")
+          end
+        end
+
+
+    - Binary and Unary Operators
+
+        If an operator has both binary and unary versions (like + and -), you preface the operator definition with
+          '@' if you want to define the unary version.
+
+          class Document
+            ...
+
+            def @+
+              Document.new( title, author, "I am sure that #{@content}" )
+            end
+
+            def @-
+              Document.new( title, author, "I doubt that #{@content}" )
+            end
+          end
+
+          favorite = Document.new('Favorite', 'Russ', 'Chocolate is best')
+          unsure = -(+favorite)
+
+
+    - Defining Braket Methods
+
+        You can define the bracket methods to make your class behave like an array or hash.
+
+          class Document
+            ...
+
+            def [](index)
+            end
+
+
+
+- Operators Across Classes
+
+    - Note that when operators are overridden, they may not be commutative the same way standard operators are.
+
+        # Legal
+        one_minute_from_now = Time.now + 60
+
+        # Will cause an error
+        one_minute_from_now = 60 + Time.now
