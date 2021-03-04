@@ -1,0 +1,294 @@
+-----------------------------------------------------------------------
+|  CHAPTER 12 - CLASSES THAT UNDERSTAND EQUALITY                      |
+-----------------------------------------------------------------------
+
+- Equality Operators
+
+    - We'll create a document store for our 'Document' class, so we'll need a new class for 
+        identifying documents.
+
+        class DocumentIdentifier
+          attr_reader :folder, :name
+
+          def initialize(folder, name)
+            @folder = folder
+            @name = name
+          end
+        end
+
+
+    - Ruby has at least 4 methods for determining class equality:
+
+        eql?
+        equal?
+        ==
+        ===
+
+
+    - The 'equal?' method tests for object identity.  It returns true only if they are references to the 
+        same object.  We should never need to override this method.
+
+        x.equal?(y)
+
+
+
+- Double Equals for Everyday Use
+
+    - By default, the == method will behave just like 'equal?'.  If we want it to behave differently, we
+        override it with a new implementation.
+
+        class DocumentIdentifier
+          attr_reader :folder, :name
+
+          def initialize(folder, name)
+            @folder = folder
+            @name = name
+          end
+
+          def ==(other)
+            return false unless other.instance_of?(self.class)
+            folder == other.folder && name == other.name
+          end
+        end
+
+
+    - Now, we can test for equality:
+
+        first_id = DocumentIdentifier.new('secret/plans', 'raygun.txt')        
+        second_id = DocumentIdentifier.new('secret/plans', 'raygun.txt')
+
+        puts "They are equal!" if first_id == second_id
+
+
+    - Sometimes, it is useful to check for identity equality first, since it can speed up equality checks
+        if we're doing a lot of them.
+
+        def ==(other)
+          return true if other.equal?(self)
+          return false unless other.instance_of?(self.class)
+          folder == other.folder && name == other.name
+        end
+
+
+
+- Broadening the == Method
+
+    - Right now, we're only defining objects as equal if they have the same class - subclasses are not
+        allowed.  If we also want to allow subclasses, we can use 'kind_of?' instead of 'instance_of?'.
+
+        class DocumentIdentifier
+          ...
+
+          def ==(other)
+            return true if other.equal?(self)
+            return false unless other.kind_of?(self.class)
+            folder == other.folder && name == other.name
+          end
+        end
+
+        class ContractIdentifier < DocumentIdentifier
+        end
+
+
+    - Now, we can compare instances of the subclass and superclass.
+
+        doc_id = DocumentIdentifier.new('contracts', 'Book Deal')
+        con_id = ContractIdentifier.new('contracts', 'Book Deal')
+
+        puts "They are equal!" if doc_id == con_id
+
+
+    - But, we can even take it a step further, since the "worrying about class hierarchies"
+        approach doesn't seem very Rubyist.  We can just test to see whether the object implements the
+        right methods instead of worrying about its class at all.
+
+        class DocumentPointer
+          attr_reader :folder, :name
+
+          def initialize(folder, name)
+            @folder = folder
+            @name = name
+          end
+
+          def ==(other)
+            return false unless other.respond_to?(:folder)
+            return false unless other.respond_to?(:name)
+            folder == other.folder && name == other.name
+          end
+        end
+
+
+
+- Well-Behaved Equality
+
+    - We still have another problem with the approaches above.
+
+        # We can call this
+        doc_id = DocumentIdentifier.new( 'contracts', 'Book Deal' )
+        con_id = ContractIdentifier.new( 'contracts', 'Book Deal' )
+        puts "They are equal!" if doc_id == con_id
+
+        # But if we reverse the operands, we'll get an error!
+        puts "They are equal!" if con_id == doc_id
+
+
+    - We could add both classes into the comparison.
+
+        def ==(other)
+          if other.instance_of? VersionedIdentifier
+            other.folder == folder &&
+            other.name == name &&
+            other.version == version
+          elsif other.instance_of? DocumentIdentifier
+            other.folder == folder && other.name == name
+          else
+            false
+          end
+        end
+
+
+    - We could also just create another method instead of using ==.
+
+        def is_same_document?(other)
+          other.folder == folder && other.name == name
+        end
+
+
+
+- Triple Equals for Case Statements
+
+    - Normally, a Regexp and a string are not equal.
+
+        /Roswell.*/ =~ 'Roswell' # Yes!
+        /Roswell.*/ == 'Roswell' # No!
+
+
+    - However, using Regexps in case statements is convenient.
+
+        location = 'area 51'
+
+        case location
+        when /area.*/
+          # ...
+        when /roswell.*/
+          # ...
+        else
+          # ...
+        end
+
+
+    - For this reason, the Regexp class has the === operator, which does pattern matching when compared with
+        a string.
+
+
+
+- Hash Tables and the eql? Method
+
+    - Imagine we want to use our DocumentIdentifier as a hash key.
+
+        hash = {}
+        document = Document.new('cia', 'Roswell', 'story')
+        first_id = DocumentIdentifier.new('public', 'CoverStory')
+
+        hash[first_id] = document
+
+
+    - That works fine, but what if we want to fetch our document using a second instance of DocumentIdentifier?
+
+        second_id = DocumentIdentifier.new('public', 'CoverStory')
+        the_doc_again = hash[second_id]
+
+        the_doc_again
+        # nil
+
+
+
+- Building a Well-Behaved Hash Key
+
+    - The 'Hash' class calls the 'hash' method to get the hash code from its keys.  Then, it uses the 'eql?' 
+        method to decide if 2 keys are the same key.
+
+
+    - The default version of 'eql?' just calls 'equals?' to compare object identities.
+
+      The default version of 'hash' just returns the 'objectId' of the object, which is guaranteed to be
+        unique.
+
+
+    - Here is an example of overriding those 2 methods.  Basically, we just need to maintain the hash prime
+        directive that if a.eql?(b) then a.hash == b.hash.
+
+        class DocumentIdentifier
+          ...
+
+          def hash
+            folder.hash ^ name.hash
+          end
+
+          def eql?(other)
+            return false unless other.instance_of?(self.class)
+            folder == other.folder && name == other.name
+          end
+        end
+
+
+
+- Example - Inheriting Equality Operators
+
+    - Getting object equality right can be tricky.  One useful technique is to borrow the functionality from 
+        an exiting type.  Here, we use the array's equality operators.
+
+        class DisArray
+          attr_reader :my_array
+
+          def initialize
+            @my_array = []
+          end
+
+          def ==(other)
+            return false unless other.kind_of?(DisArray)
+            @my_array == other.my_array
+          end
+
+          def eql?(other)
+            return false unless other.kind_of?(DisArray)
+            @my_array.eql?(other.my_array)
+          end
+
+          def hash
+            @my_array.hash
+          end
+
+          ...
+        end
+
+
+
+- The 'Comparable' Mixin
+
+    - Ruby's built-in numeric types will often do automatic type conversion.
+
+        puts 1 == 1.0    # Fixnum and Float
+        true
+
+
+    - Classes like 'Float' and 'Fixnum', which have a natural ordering, can also implement the '<=>' operator.
+
+        # Evaluates to -1 if a < b
+        #               0 if a == b
+        #               1 if a > b
+        a <=> b
+
+
+    - To implement the operator, we include the 'Comparable' mixin.  This will use the implementation of the '<=>'
+        operator to automatically implement the <, <=, >=, and > operators.
+
+        class RomanNumerals
+          include Comparable
+
+          ...
+
+          def <=>(other)
+            # Return -1, 0, or 1
+          end
+        end
