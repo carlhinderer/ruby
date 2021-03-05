@@ -1,0 +1,45 @@
+-----------------------------------------------------------------------
+|  APPENDIX A - EXCEPTION HANDLING                                    |
+-----------------------------------------------------------------------
+
+- The 'ensure' block is used for a block that will always be run.
+
+    begin
+      puts "Opening TCP connection..."
+      http = Net::HTTP.start(uri.host, uri.port)
+      puts "Sending HTTP request..."
+      puts http.request_get(uri.path).body
+    ensure
+      if http
+        puts "Closing the TCP connection..."
+        http.finish
+      end
+    end
+
+
+
+- The 'retry' block is used to retry a piece of code.
+
+    require "net/http"
+
+    http = nil
+    uri = URI("http://localhost:4567/")
+
+    begin
+      unless http
+        puts "Opening TCP connection..."
+        http =ls
+         Net::HTTP.start(uri.host, uri.port, read_timeout: 10)
+      end
+      puts "Executing HTTP request..."
+      puts http.request_get(uri.path).body
+    rescue Errno::ECONNREFUSED, Net::ReadTimeout => e
+      puts "Timeout (#{e}), retrying in 1 second..."
+      sleep(1)
+      retry
+    ensure
+      if http
+        puts "Closing the TCP connection..."
+        http.finish
+      end
+    end

@@ -1,0 +1,10 @@
+-----------------------------------------------------------------------
+|  APPENDIX B - ODDS & ENDS.                                          |
+-----------------------------------------------------------------------
+
+- The Safe Navigation Operator
+
+    The Safe Navigation Operator will stop executing the statement if 'nil' is encountered.  So, it won't cause
+      a 'NoMethodError'.
+
+      @object&.method
