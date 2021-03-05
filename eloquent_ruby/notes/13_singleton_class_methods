@@ -1,0 +1,138 @@
+-----------------------------------------------------------------------
+|  CHAPTER 13 - SINGLETON AND CLASS METHODS                           |
+-----------------------------------------------------------------------
+
+- Singleton Methods
+
+    - In Ruby, a 'singleton method' is a method that is defined for exactly one object instance.  Note that
+        this has nothing to do with the common Singleton design pattern.
+
+
+    - To define singleton methods on an instance, we just preface the method definition with the instance name.
+        For an example, we can define stub methods by hand:
+
+        hand_built_stub_printer = Object.new
+
+        def hand_built_stub_printer.available?
+          true
+        end
+
+        def hand_built_stub_printer.render(content)
+          nil
+        end
+
+
+    - Now, we can call the methods:
+
+        hand_built_stub_printer.available?
+        hand_built_stub_printer.render('abcd')
+
+
+    - Singleton methods will override any regular, class-defined methods.
+
+
+    - There is another syntax for creating singleton methods, which is a lot less bulky if you're creating
+        a lot of methods.
+
+        hand_built_stub_printer = Object.new
+
+        class << hand_built_stub_printer
+          def available?
+            true
+          end
+
+          def render
+            nil
+          end
+        end
+
+
+
+- Implementation of Singleton Methods
+
+    - To implement singleton methods, each Ruby object has a secret 'singleton' class that sits between
+        every object and its regular class.
+
+        Object    <-    Singleton Class   <-   Instance
+
+
+    - If you ever wanted to access the singleton class directly:
+
+        singleton_class = class << hand_built_stub_printer
+          self
+        end
+
+
+
+- Class Methods
+
+    - Here, we create a singleton method that prints information about its host object.
+
+        my_object = Document.new('War and Peace', 'Tolstoy', 'All happy families...')
+
+        def my_object.explain
+          puts "self is #{self}"
+          puts "and its class is #{self.class}"
+        end
+
+        my_object.explain
+        # self is #<Document:0xb7bc2ca0>
+        # and its class is Document
+
+
+    - We can also put a singleton method on the class itself rather than an instance.
+
+        my_object = Document
+
+        def my_object.explain
+          puts "self is #{self}"
+          puts "and its class is #{self.class}"
+        end
+
+        my_object.explain
+        # self is Document
+        # and its class is Class
+
+
+    - We can also define a singleton method on the 'Document' class explicitly.  In fact, it looks exactly
+        like a class method definition!
+
+        def Document.explain
+          puts "self is #{self}"
+          puts "and its class is #{self.class}"
+        end
+
+
+    - In fact, you will sometimes see syntax like this used to define class methods:
+
+        class Document
+          class << self
+            def find_by_name(name)
+              ...
+            end
+
+            def find_by_id(doc_id)
+              ...
+            end
+          end
+        end
+
+
+
+- Class Method Examples
+
+    - Each ActiveRecord model class has lots of class method.
+
+        class Author < ActiveRecord::Base
+          ...
+        end
+
+        # Get table associated to model
+        my_table_name = Author.table_name
+
+
+    - The 'Date' class contains a lot of class methods for creating instances.
+
+        require 'date'
+
+        xmas = Date.ordinal(2010, 359)
