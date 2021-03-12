@@ -1,0 +1,104 @@
+-----------------------------------------------------------------------
+|  CHAPTER 14 - CLASS INSTANCE VARIABLES                              |
+-----------------------------------------------------------------------
+
+- Class Variables
+
+    - Class variables are associated with the class, not an instance of it.
+
+        class Resume < Document
+          @@default_font = :arial
+
+          ...
+        end
+
+
+    - Class variables aren't often used, due to some peculiarities about how they are resolved.
+        To resolve them, the interpreter starts with the subclass and moves up the inheritance
+        hierarchy until the variable is found.  If it is not found, it is set on the class it is
+        called on.
+
+
+
+- Class Instance Variables
+
+    - Class instance variables are usually used instead.
+
+        class Document
+          @default_font = :times
+
+          def self.default_font=(font)
+            @default_font = font
+          end
+
+          def self.default_font
+            @default_font
+          end
+
+          ...
+        end
+
+
+    - This can be used to set variables at the class level without having to worry about what happens
+        in the rest of the inheritance hierarchy.  Technically, this is an instance variable on the 
+        class object.
+
+        Document.default_font = :arial
+
+      Then, it's easy to get the 'Document' class's default font:
+
+        def initialize(title, author)
+          @title = title
+          @author = author
+          @font = Document.default_font
+        end
+
+
+
+- Class Instance Variables and Subclases
+
+    - We can override a class instance variable in a subclass without changing the value in the
+        superclass.
+
+        class Presentation < Document
+          @default_font = :nimbus
+
+          class << self
+            attr_accessor :default_font
+          end
+
+          def initialize(title, author)
+            @title = title
+            @author = author
+            @font = Presentation.default_font
+          end
+        end
+
+
+    - Then, we can get the default font for either class:
+
+        Document.default_font
+        Presentation.default_font
+
+
+    - Since class instance variables are just plain instance variables attached to a class object,
+        we can use the usual 'attr_accessor' method so that we don't have to add a getter or setter.  
+        That is what we're doing here:
+
+        class << self
+          attr_accessor :default_font
+        end
+
+
+
+- Class Instance Variable Examples
+
+    - Active Record callbacks are stored in class instance variables.
+
+        class Person < ActiveRecord::Base
+          after_save :handle_after_save
+
+          def handle_after_save
+            # Do something
+          end
+        end
