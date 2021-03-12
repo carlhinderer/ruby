@@ -1,0 +1,144 @@
+-----------------------------------------------------------------------
+|  CHAPTER 15 - USE MODULES AS NAMESPACES                             |
+-----------------------------------------------------------------------
+
+- Using Modules
+
+    - A module can be used to group together related classes.
+
+        module Rendering
+          class Font
+            ...
+          end
+
+          class PaperSize
+            ...
+          end
+        end
+
+
+    - Then, we can use the scope operator to get the class.
+
+        font = Rendering::Font.new
+
+
+    - Modules can also hold constants, which are accessed the same way as classes.
+
+        module Rendering
+          ...
+
+          DEFAULT_FONT = Font.new('default')
+          DEFAULT_PAPER_SIZE = PaperSize.new
+
+
+    - If you don't have to namespace every class or constant, you can just include the entire module.
+
+        include Rendering
+
+        puts "The default paper height is #{DEFAULT_PAPER_SIZE.height}."
+
+
+    - Modules can be nested.
+
+        module WordProcessing
+          module Rendering
+            ...
+          end
+        end
+
+
+
+- Enclosing Utility Methods
+
+    - Modules can also enclose individual methods.  This is a convenient place to put utility methods.
+
+        module WordProcessor
+          def self.points_to_inches(points)
+            points / 72.0
+          end
+
+          def self.inches_to_points(inches)
+            inches * 72.0
+          end
+        end
+
+
+    - To call the utility methods:
+
+        # This is usually used
+        an_inch_of_points = WordProcessor.inches_to_points(1.0)
+
+        # This is valid, but used less often
+        an_inch_of_points = WordProcessor::inches_to_points(1.0)
+
+
+
+- Modules in Multipe Files
+
+    - Note that modules do not have to be contained in a single file.  They can be spread out over
+        any number of source files.
+
+        # font.rb
+        ----------------------
+        module Rendering
+          class Font
+            ...
+          end
+        end
+
+        # paper_size.rb
+        ----------------------
+        module Rendering
+          class PaperSize
+            ...
+          end
+        end
+
+
+    - If we want both parts of the module available in our source file, we have to import both files.
+
+        require 'font'
+        require 'paper_size'
+
+
+
+- Modules are Objects
+
+    - In Ruby, just about everything is an object, including modules.
+
+        the_module = Rendering
+        times_new_roman_font = the_module::Font.new('times-new-roman')
+
+
+    - We can swap out modules at runtime.
+
+        # Module for laser printer
+        module TonsOfToner
+          class PrintQueue
+            ...
+          end
+
+          class Administration
+            ...
+          end
+        end
+
+        # Module for inkjet printer
+        module OceansOfInk
+          class PrintQueue
+            ...
+          end
+
+          class Administration
+            ...
+          end
+        end
+
+        # Swap them at runtime
+        if use_laser_printer
+          print_module = TonsOfToner
+        else
+          print_module = OceansOfInk
+        end
+
+        admin = print_module::Administration.new
