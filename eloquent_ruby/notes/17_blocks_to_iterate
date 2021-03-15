@@ -1,0 +1,174 @@
+-----------------------------------------------------------------------
+|  CHAPTER 17 - USE BLOCKS TO ITERATE                                 |
+-----------------------------------------------------------------------
+
+- Review of Code Blocks
+
+    - You create code blocks by tacking them onto the end of a method call.
+
+        # Multiline
+        do_something do
+          puts "Hello from inside the block."
+        end
+
+        # Single Line
+        do_something { puts "Hello from inside the block." }
+
+
+    - When you tack a block onto the end of a method call, the block gets packaged up
+        and passed to the method as a hidden argument.  Inside the method, you can detect 
+        whether a block was passed in using the 'block_given?' method.  You can fire off
+        the block with the 'yield' method.
+
+        def do_something
+          yield if block_given?
+        end
+
+
+    - Blocks can take arguments, which you supply to the 'yield' method.
+
+        def do_something_with_an_arg
+          yield("Hello world") if block_given?
+        end
+
+        do_something_with_an_arg do |message|
+          puts "The message is #{message}"
+        end
+
+
+    - Like most everything else in Ruby, a block always returns a value, which you can use
+        or ignore depending on your needs.
+
+        def print_value_returned_by_block
+          if block_given?
+            value = yield
+            puts "The block returned #{value}."
+          end
+        end
+
+
+
+- Iterators
+
+    - An iterator method calls its block once for each element in a collection, passing
+        the element into the block as a parameter.
+
+        class Document
+          ...
+          def each_word
+            word_array = words
+            index = 0
+            while index < words.size
+              yield(word_array[index])
+              index += 1
+            end
+          end
+        end
+
+        d = Document.new('Truth', 'Gump', 'Life is like a box of ...')
+        d.each_word { |word| puts word }
+
+
+    - Note that a real implementation would probably take advantage of the 'each' method of 
+        the array.
+
+        def each_word
+          words.each { |word| yield(word) }
+        end
+
+
+
+- Iterating Over The Ethereal
+
+    - Note that an iterator can run through a collection that doesn't physically exist.  For
+        instance, Ruby never actually creates an array of 12 integers in this code:
+
+        12.times { |x| puts "The number is #{x}." }
+
+      Instead, the 'times' method produces each number, one at a time, and feeds it into the
+        block.
+
+
+    - We can use this same trick to build our own iterators:
+
+        class Document
+          ...
+
+          def each_word_pair
+            word_array = words
+            index = 0
+            while index < (word_array.size - 1)
+              yield word_array[index], word_array[index + 1]
+            end
+          end
+        end
+
+        doc = Document.new('Donuts', '?', 'I love donuts mmmm donuts' )
+        doc.each_word_pair{ |first, second| puts "#{first} #{second}" }
+
+
+
+- The Enumerable Module
+
+    - The 'Enumerable' module is a mixin that gives classes a host of collection-related
+        methods.  To use it, you just include it in your class and define an 'each' method.
+
+        class Document
+          include Enumerable
+
+          def each
+            words.each { |word| yield(word) }
+          end
+
+          ...
+        end
+
+        # Now, we can use the methods
+        doc = Document.new('Advice', 'Harry', 'Go ahead make my day')
+
+        doc.include?("make")
+        doc.find("make")
+        doc.find_all("make")
+
+
+    - Enumerable also adds the 'each_cons' method which will call the block, passing in
+        consecutive elements.
+
+        def each_word_pair
+          words.each_cons(2) { |array| yield array[0], array[1] }
+        end
+
+
+    - The 'each_slice' method works similarly, but it just breaks the collection into
+        chunks of a given size and passes them into the block.
+
+
+    - If the elements in your collection define the <=> operator, you can use the 'sort'
+        method provided by Enumerable.
+
+
+    - In addition to the 'Enumerable' module, Ruby also provides the 'Enumerator' class.
+        If you create an Enumerator instance, and pass in your collection and iterator,
+        you'll get an object that knows how to sequence through your collection.
+
+        doc = Document.new('example', 'russ', 'We are all characters')
+        enum = Enumerator.new(doc, :each_character)
+
+        # Then we can use the sequence operations
+        puts enum.count
+        pp enum.sort
+
+
+
+- Staying Out of Trouble
+
+    - Note that you can break out mid-block.
+
+        def count_till_tuesday(doc)
+          count = 0
+          doc.each_word do |word|
+            count += 1
+            break if word == 'Tuesday'
+          end
+          count
+        end
