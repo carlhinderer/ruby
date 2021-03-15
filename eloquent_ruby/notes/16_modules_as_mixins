@@ -1,0 +1,179 @@
+-----------------------------------------------------------------------
+|  CHAPTER 16 - USE MODULES AS MIXINS                                 |
+-----------------------------------------------------------------------
+
+- Using Mixins
+
+    - Instead of reusing code with inheritance hierarchies, we can reuse code by 'mixing in'
+        modules into the tree.  This allows common code to easily be shared among otherwise
+        unrelated classes.
+
+
+    - Here, we create a module that can be mixed into any class.  That way, we don't have to
+        try to fit it into some inheritance hierarchy.
+
+        module WritingQuality
+          CLICHES = [ /play fast and loose/,
+                      /make no mistake/,
+                      /does the trick/,
+                      /off and running/,
+                      /my way or the highway/ ]
+
+          def number_of_cliches
+            CLICHES.inject(0) do |count, phrase|
+              count += 1 if phrase =~ content
+              count
+            end
+          end
+        end
+
+
+    - And we can use the module anywhere we want.
+
+        class Document
+          include WritingQuality
+          ...
+        end
+
+        class ElectronicBook < ElectronicText
+          include WritingQuality
+          ...
+        end
+
+
+    - Once you've included a module in a class, the module's methods become available
+        to the including class.
+
+        text = "my way or the highway does the trick"
+        my_tome = Document.new('Hackneyed', 'Russ', text)
+        puts my_tome.number_of_cliches
+
+
+    - You can mix in as many modules into a class as you want.
+
+        class ElectronicBook < ElectronicText
+          include WritingQuality
+          include ProjectManagement
+          include AuthorAccountTracking
+        end
+
+
+
+- Extending a Module
+
+    - Sometimes you may want to pull in a module's as class methods rather than instance
+        methods.  For instance, you have a class with methods to find documents.
+
+        module Finders
+          def find_by_name(name)
+            # Find a document by name
+          end
+
+          def find_by_id(doc_id)
+            # Find a document by id
+          end
+        end
+
+
+    - To import the methods from the 'Finders' module as class methods:
+
+        class Document
+          ...
+          class << self
+            include Finders
+          end
+        end
+
+
+    - Then to use the class methods:
+
+        war_and_peace = Document.find_by_name('War and Peace')
+
+
+    - This is such a common task that Ruby also includes the 'extend' keyword to do the 
+        same thing.
+
+        class Document
+          extend Finders
+          ...
+        end
+
+
+
+- Staying Out of Trouble
+
+    - In the background, Ruby actually inserts a mixed in module into the inheritance
+        hierarchy of the class its included in.  So, we can check programatically whether
+        a class mixes in a module.
+
+        # Check whether a module is mixed in
+        my_tome.kind_of?(WritingQuality)
+
+        # See inheritance hierarchy, including modules
+        Document.ancestors
+        # [Document, WritingQuality, Object, Kernel, BasicObject]
+
+
+    - Remember that any method definition in the hierarchy overrides any other implementation,
+        including in a superclass or a module that was included in a superclass.
+
+        module PoliticalWritingQuality
+          def number_of_cliches
+            0
+          end
+        end
+
+        class PoliticalBook < Document
+          include WritingQuality
+          include PoliticalWritingQuality    # This implementation wins!
+
+          ...
+        end
+
+
+
+- Examples - Rails Helpers
+
+    - The 'ActionView' helpers make creating HTML elements easier.
+
+        module ActionView
+          module Helpers
+            module FormHelper
+              def label(object_name, method, text = nil, options = {})
+                # ...
+              end
+
+              def radio_button(object_name, method, tag_value,options={})
+                # ...
+              end
+            end
+          end
+        end
+
+
+    - Here are is a module of error codes that might come back from sqlite.
+
+        module ErrorCode
+          OK         =  0   # Successful result
+          ERROR      =  1   # SQL error or missing database
+          INTERNAL   =  2   # An internal logic error in SQLite
+          PERM       =  3   # Access permission denied
+          ABORT      =  4   # Callback routine requested an abort
+          BUSY       =  5   # The database file is locked
+          LOCKED     =  6   # A table in the database is locked
+          # Seemingly endless list of remaining error codes omitted...
+        end
+
+        class SomeSqliteApplication
+          include ErrorCode
+
+          def print_status_message(status)
+            if status == ERROR
+              puts "It failed!"
+            elsif status == OK
+              puts "It worked!"
+            else
+              puts "Status was #{status}."
+            end
+          end
+        end
