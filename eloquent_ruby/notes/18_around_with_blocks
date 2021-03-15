@@ -1,0 +1,144 @@
+-----------------------------------------------------------------------
+|  CHAPTER 18 - EXECUTE AROUND WITH A BLOCK                           |
+-----------------------------------------------------------------------
+
+- Example - Adding Logging
+
+    - Here, we add the ability to add logging to any arbitrary block of code.
+
+        class SomeApplication
+          def do_something
+            with_logging('load') { @doc = Document.load('resume.txt') }
+            # Do something with the document...
+            with_logging('save') { @doc.save }
+          end
+
+          def with_logging(description)
+            begin
+              @logger.debug("Starting #{description}")
+              yield
+              @logger.debug("Completed #{description}")
+            rescue
+              @logger.error("#{description} failed")
+              raise
+            end
+          end
+        end
+
+
+
+- Executing Around
+
+    - The pattern of using a block to 'execute around' is useful when you need something
+        to always run before or after some operation.
+
+        def log_before(description)
+          @logger.debug("Starting #{description}")
+          yield
+        end
+
+        def log_after(description)
+          yield
+          @logger.debug("Done #{description}")
+        end
+
+
+
+- Setting Up Objects with an Initialization Block
+
+    - Executing around can also help with initializing objects.
+
+        class Document
+          attr_accessor :title, :author, :content
+
+          def initialize(title, author, content = '')
+            @title = title
+            @author = author
+            @content = content
+            yield(self) if block_given?
+          end
+
+          ...
+        end
+
+
+    - Then, we can use some block to continue initializing the object.
+
+        new_doc = Document.new('US Constitution', 'Madison', '') do |d|
+          d.content << 'We the people'
+          d.content << 'In order to form a more perfect union'
+          d.content << 'provide for the common defense'
+        end
+
+
+
+- Dragging Your Scope Along with the Block
+
+    - One important note is that all variables that are visible just before the 'do' or '{'
+        are visible inside the code block.  Code blocks drag along the scope in which they
+        were created wherever they go.
+
+
+    - So, the rule of thumb with passing variables into blocks is to pass in variables that
+        the execute around code will use, not the block itself.
+
+        def with_database_connection(connection_info)
+          connection = Database.new(connection_info)
+          begin
+            yield(connection)
+          ensure
+            connection.close
+          end
+        end
+
+
+
+- Carrying the Answers Back
+
+    - You may want to return some result from a block.  Unfortunately, this code will
+        toss out the return result.
+
+        def do_something_silly
+          with_logging( 'Compute miles in a light year' ) do
+            186000 * 60 * 60 * 24 * 365
+          end
+        end
+
+
+    - Instead, to return a result:
+
+        def with_logging(description)
+          begin
+            @logger.debug("Starting #{description}")
+            return_value = yield
+            @logger.debug("Completed #{description}")
+            return_value
+          rescue
+            @logger.error("#{description} failed")
+          end
+        end
+
+
+
+- Examples
+
+    - If we use the 'File.open' block, the file will automatically be closed at the end
+        of the block.
+
+        File.open('/etc/passwd') do |f|
+          # Do something with file
+        end
+
+
+    - To create a description for a Ruby gem:
+
+        SPEC = Gem::Specification.new do |s|
+          #### Basic information.
+          s.name = 'rake'
+          s.version = $package_version
+          s.summary = "Ruby based make-like utility."
+          s.description = <<-EOFRake is a Make-like program implemented in Ruby. Tasks
+            and dependencies are specified in standard Ruby syntax.
+          EOF
+          # Lots and lots omitted!
+        end
